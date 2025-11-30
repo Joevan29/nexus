@@ -5,6 +5,7 @@ export interface Driver {
   status: 'idle' | 'busy' | 'offline';
   current_lat: number;
   current_lng: number;
+  phone?: string;
 }
 
 export interface Shipment {
@@ -19,12 +20,28 @@ export interface Shipment {
   weight: number;
   driver_id?: number | null;
   route_order?: number;
+  updated_at?: string;
 }
 
-export interface AssignmentResponse {
-  success: true;
-  assignments: {
-    driver_id: number;
-    shipment_id: number;
+export interface Product {
+  id: number;
+  sku: string;
+  name: string;
+  stock: number;
+  price: number;
+  location?: string;
+  status: 'active' | 'low_stock' | 'out_of_stock';
+  image_url?: string;
+}
+
+export interface DashboardMetrics {
+  valuation: string;
+  pendingOrders: number;
+  activeFleet: string;
+  fleetUtilization: number;
+  recentActivities: {
+    tracking_id: string;
+    status: string;
+    updated_at: string;
   }[];
 }
