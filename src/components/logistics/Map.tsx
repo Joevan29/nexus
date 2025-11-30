@@ -5,14 +5,37 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Pusher from 'pusher-js';
-import { Driver, Shipment } from '@/src/types';
+import { QrCode } from 'lucide-react'; 
+import QRPopup from './QRPopup';
+
+interface Driver {
+  id: number;
+  name: string;
+  vehicle_type: 'motor' | 'van' | 'truck';
+  status: 'idle' | 'busy' | 'offline';
+  current_lat: number;
+  current_lng: number;
+}
+
+interface Shipment {
+  id: number;
+  tracking_id: string;
+  origin_address: string;
+  destination_address: string;
+  destination_lat: number;
+  destination_lng: number;
+  status: 'pending' | 'assigned' | 'in_transit' | 'delivered';
+  price: number;
+  weight: number;
+  driver_id?: number | null;
+  route_order?: number;
+}
 
 const getDriverColor = (id: number) => {
   const colors = ['#2563eb', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777'];
   return colors[id % colors.length];
 };
 
-// Custom Icon Maker
 const createIcon = (emoji: string, color: string) => L.divIcon({
   className: 'custom-map-icon',
   html: `
@@ -37,6 +60,8 @@ export default function LogisticsMap() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [driverRoutes, setDriverRoutes] = useState<Record<number, [number, number][]>>({});
+  
+  const [selectedQR, setSelectedQR] = useState<{id: string, addr: string} | null>(null);
 
   const fetchData = async () => {
     try {
@@ -57,7 +82,7 @@ export default function LogisticsMap() {
     const assignedShipments: Record<number, Shipment[]> = {};
     
     currentShipments.forEach(pkg => {
-        if (pkg.status === 'assigned' && pkg.driver_id) {
+        if ((pkg.status === 'assigned' || pkg.status === 'in_transit') && pkg.driver_id) {
             if (!assignedShipments[pkg.driver_id]) assignedShipments[pkg.driver_id] = [];
             assignedShipments[pkg.driver_id].push(pkg);
         }
@@ -94,7 +119,11 @@ export default function LogisticsMap() {
           cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || 'ap1',
         });
         const channel = pusher.subscribe('map-channel');
-        channel.bind('update-data', () => { fetchData(); });
+        
+        channel.bind('update-data', () => { 
+          console.log("Realtime update received!");
+          fetchData(); 
+        });
         
         return () => { 
           pusher.unsubscribe('map-channel'); 
@@ -108,6 +137,15 @@ export default function LogisticsMap() {
 
   return (
     <div className="w-full h-full rounded-xl overflow-hidden bg-slate-100 relative z-0">
+      
+      {selectedQR && (
+        <QRPopup 
+          trackingId={selectedQR.id} 
+          address={selectedQR.addr} 
+          onClose={() => setSelectedQR(null)} 
+        />
+      )}
+
       <MapContainer 
         center={[-6.2000, 106.8166]}
         zoom={12} 
@@ -115,7 +153,7 @@ export default function LogisticsMap() {
         zoomControl={false}
       >
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/">CartoDB</a>'
+          attribution='&copy; CartoDB'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
 
@@ -138,13 +176,29 @@ export default function LogisticsMap() {
             <Marker 
               key={`shipment-${pkg.id}`}
               position={[Number(pkg.destination_lat), Number(pkg.destination_lng)]} 
-              icon={createIcon('📦', pkg.status === 'assigned' ? getDriverColor(pkg.driver_id || 0) : '#64748b')}
+              icon={createIcon('📦', pkg.status === 'assigned' || pkg.status === 'in_transit' ? getDriverColor(pkg.driver_id || 0) : '#64748b')}
             >
               <Popup>
-                <div className="p-1">
+                <div className="p-1 min-w-[160px]">
                   <h3 className="font-bold text-sm">Order #{pkg.tracking_id}</h3>
-                  <p className="text-xs">{pkg.destination_address}</p>
-                  <span className="text-[10px] font-bold bg-slate-100 px-1 rounded">{pkg.status}</span>
+                  <p className="text-xs mb-2 text-slate-600">{pkg.destination_address}</p>
+                  
+                  <div className="flex gap-2 items-center justify-between mt-2 pt-2 border-t border-slate-100">
+                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
+                        pkg.status === 'pending' ? 'bg-slate-200 text-slate-600' : 
+                        pkg.status === 'in_transit' ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600'
+                     }`}>
+                        {pkg.status}
+                     </span>
+                     
+                     <button 
+                       onClick={() => setSelectedQR({ id: pkg.tracking_id, addr: pkg.destination_address })}
+                       className="bg-slate-900 text-white p-1.5 rounded hover:bg-slate-700 transition-colors"
+                       title="Show Handover QR"
+                     >
+                       <QrCode size={14} />
+                     </button>
+                  </div>
                 </div>
               </Popup>
             </Marker>
