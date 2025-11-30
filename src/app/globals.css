@@ -3,33 +3,28 @@
 @theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Custom Colors */
+  --color-brand-50: #f0f9ff;
+  --color-brand-500: #0ea5e9;
+  --color-brand-600: #0284c7;
+  --color-dark-900: #0f172a;
+  --color-dark-800: #1e293b;
 }
 
 :root {
   --background: #f8fafc; 
-  --foreground: #0f172a; 
-  
-  --card: #ffffff;
-  --card-foreground: #1e293b; 
-  --border: #e2e8f0; 
-  --input: #f1f5f9; 
-  
-  --primary: #2563eb; 
-  --primary-foreground: #ffffff;
-  --primary-hover: #1d4ed8; 
-  
-  --success: #10b981; 
-  --success-bg: #ecfdf5; 
-  --warning: #f59e0b; 
-  --warning-bg: #fffbeb; 
-  --danger: #ef4444; 
-  --danger-bg: #fef2f2; 
+  --foreground: #0f172a;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  -webkit-font-smoothing: antialiased;
 }
 
 @utility card-basic {
@@ -38,4 +33,28 @@ body {
 
 @utility table-row-hover {
   @apply hover:bg-slate-50 transition-colors duration-150;
+}
+
+@utility card-premium {
+  @apply bg-white border border-slate-200/60 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] transition-all duration-300;
+
+  &:hover {
+    @apply shadow-[0_10px_30px_-10px_rgba(6,81,237,0.15)] border-slate-300 translate-y-[-2px];
+  }
+}
+
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+  }
 }
