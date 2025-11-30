@@ -19,7 +19,6 @@ export async function POST(req: Request) {
     } 
     else if (status === 'delivered') {
       await query("UPDATE shipments SET status = 'delivered' WHERE id = $1", [shipmentId]);
-      =
       const checkRes = await query("SELECT count(*) as count FROM shipments WHERE driver_id = $1 AND status != 'delivered'", [driverId]);
       const remainingPackages = Number(checkRes.rows[0].count);
       
