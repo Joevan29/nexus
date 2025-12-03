@@ -2,21 +2,23 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Box, Truck, Users, Package2, LifeBuoy } from "lucide-react";
+import { LayoutDashboard, Box, Truck, Users, Package2, LifeBuoy, FileText } from "lucide-react";
 import { motion } from 'framer-motion';
 
 const menuItems = [
   { group: "Main Menu", items: [{ href: "/", icon: LayoutDashboard, label: "Overview" }] },
   { group: "Operations", items: [
       { href: "/inventory", icon: Box, label: "Inventory" },
-      { href: "/inbound", icon: Box, label: "Inbound", rotate: 180 },
+      { href: "/orders", icon: FileText, label: "Shipments" },
+      { href: "/inbound", icon: Box, label: "Inbound Stock", rotate: 180 },
+      { href: "/outbound", icon: Truck, label: "Create Order" },
       { href: "/fleet", icon: Truck, label: "Fleet Command" },
       { href: "/drivers", icon: Users, label: "Personnel" }
     ] 
   },
 ];
 
-export default function Sidebar({ mobile }: { mobile?: boolean }) { 
+export default function Sidebar({ mobile }: { mobile?: boolean }) {
   const pathname = usePathname();
 
   const baseClass = mobile 

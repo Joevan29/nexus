@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from 'sonner';
 import AppShell from '@/src/components/layout/AppShell';
 import NextAuthProvider from '@/src/components/providers/NextAuthProvider';
+import { NotificationProvider } from '@/src/components/providers/NotificationProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +29,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        
+
         <NextAuthProvider>
-          <AppShell>
-            {children}
-          </AppShell>
+          
+          <NotificationProvider>
+            
+            <AppShell>
+              {children}
+            </AppShell>
+
+          </NotificationProvider>
         </NextAuthProvider>
 
         <Toaster 
