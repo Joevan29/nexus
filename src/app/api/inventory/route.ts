@@ -6,11 +6,11 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const limit = parseInt(searchParams.get('limit') || '8'); 
     const offset = (page - 1) * limit;
-
+    
     const sqlData = `
-      SELECT id, sku, name, category, stock, price, location, status, image_url
+      SELECT id, sku, name, stock, price, location, status
       FROM products 
       WHERE name ILIKE $1 OR sku ILIKE $1 
       ORDER BY id ASC
@@ -41,33 +41,8 @@ export async function GET(req: Request) {
       }
     });
 
-  } catch (error) {
-    console.error("Inventory API Error:", error);
-    return NextResponse.json({ error: 'Gagal mengambil data' }, { status: 500 });
-  }
-}
-
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const { sku, name, stock, price, location, category } = body;
-
-    let status = 'active';
-    if (stock == 0) status = 'out_of_stock';
-    else if (stock < 10) status = 'low_stock';
-
-    const sql = `
-      INSERT INTO products (sku, name, stock, price, location, status)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      ON CONFLICT (sku) DO UPDATE 
-      SET stock = products.stock + $3, status = $6
-      RETURNING *
-    `;
-
-    const result = await query(sql, [sku, name, stock, price, location, status]);
-    return NextResponse.json(result.rows[0]);
-  } catch (error) {
-    console.error("Inbound Error:", error);
-    return NextResponse.json({ error: 'Gagal menyimpan data' }, { status: 500 });
+  } catch (error: any) {
+    console.error("Inventory API Error:", error.message);
+    return NextResponse.json({ error: error.message || 'Gagal mengambil data' }, { status: 500 });
   }
 }
