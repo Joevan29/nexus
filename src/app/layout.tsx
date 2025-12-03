@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { CommandMenu } from '@/src/components/ui/CommandMenu';
 import { Toaster } from 'sonner';
-import NexusCopilot from '@/src/components/ui/NexusCopilot';
-import RealtimeListener from '@/src/components/ui/RealtimeListener';
-import Sidebar from '@/src/components/ui/Sidebar'; 
+import AppShell from '@/src/components/layout/AppShell'; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,32 +26,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-screen bg-slate-50 text-slate-900 overflow-hidden`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         
-        <Sidebar />
+        <AppShell>
+          {children}
+        </AppShell>
 
-        <main className="flex-1 relative flex flex-col h-full overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
-            <div className="max-w-7xl mx-auto pb-20">
-              {children}
-            </div>
-          </div>
-
-          <CommandMenu />
-          
-          <NexusCopilot />
-          
-          <RealtimeListener />
-          
-          <Toaster 
-            position="bottom-right" 
-            toastOptions={{
-              className: 'bg-white border border-slate-200 shadow-lg text-slate-800 rounded-xl',
-              descriptionClassName: 'text-slate-500'
-            }} 
-          />
-        </main>
-
+        <Toaster 
+          position="bottom-right" 
+          toastOptions={{
+            className: 'bg-white border border-slate-200 shadow-lg text-slate-800 rounded-xl',
+            descriptionClassName: 'text-slate-500'
+          }} 
+        />
       </body>
     </html>
   );
