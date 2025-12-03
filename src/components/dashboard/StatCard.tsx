@@ -1,57 +1,90 @@
-import { LucideIcon, ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
+'use client';
 
-interface StatCardProps {
-  title: string;
-  value: string;
-  trend: string;
-  trendUp: boolean;
-  icon: LucideIcon;
-  description?: string;
-}
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { Package2, ArrowRight, Loader2, Lock, Mail } from 'lucide-react';
+import { toast } from 'sonner';
 
-export default function StatCard({ 
-  title, 
-  value, 
-  trend, 
-  trendUp, 
-  icon: Icon,
-  description 
-}: StatCardProps) {
+export default function LoginPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('admin@nexus.com');
+  const [password, setPassword] = useState('password123');
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const res = await signIn('credentials', { redirect: false, email, password });
+    
+    if (res?.error) {
+      toast.error("Akses Ditolak", { description: "Email atau password salah." });
+      setIsLoading(false);
+    } else {
+      toast.success("Welcome back, Commander!");
+      router.push('/');
+      router.refresh();
+    }
+  };
+
   return (
-    <div className="card-premium p-6 relative overflow-hidden group">
-      <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity transform group-hover:scale-110 duration-500">
-        <Icon size={80} />
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-slate-950">
+      
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/30 rounded-full blur-[120px] animate-pulse"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse delay-1000"></div>
+      
+      <div className="relative z-10 w-full max-w-md p-8 m-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
+            <Package2 size={32} className="text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">NEXUS COMMAND</h1>
+          <p className="text-slate-400 text-sm mt-2">Masuk untuk mengelola logistik global.</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-300 uppercase ml-1">Email</label>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+              <input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="relative w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+              />
+              <Mail className="absolute left-3 top-3.5 text-slate-500" size={18} />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-300 uppercase ml-1">Password</label>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="relative w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+              />
+              <Lock className="absolute left-3 top-3.5 text-slate-500" size={18} />
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2 mt-2 group"
+          >
+            {isLoading ? <Loader2 className="animate-spin" /> : (
+              <>Access Terminal <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></>
+            )}
+          </button>
+        </form>
       </div>
 
-      <div className="flex justify-between items-start mb-4 relative z-10">
-        <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors shadow-sm">
-          <Icon size={22} strokeWidth={2} />
-        </div>
-        
-        {trend && (
-          <div className={`flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full border transition-colors ${
-            trendUp 
-              ? 'bg-emerald-50/50 text-emerald-700 border-emerald-100 group-hover:bg-emerald-100' 
-              : 'bg-rose-50/50 text-rose-700 border-rose-100 group-hover:bg-rose-100'
-          }`}>
-            {trendUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-            {trend}
-          </div>
-        )}
-      </div>
-      
-      <div className="relative z-10">
-        <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight font-sans">
-          {value}
-        </h3>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
-          {title}
-        </p>
-        {description && (
-          <p className="text-xs text-slate-500 mt-3 leading-relaxed line-clamp-2 border-t border-slate-50 pt-3 opacity-80 group-hover:opacity-100 transition-opacity">
-            {description}
-          </p>
-        )}
+      <div className="absolute bottom-6 text-center w-full">
+        <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Secured by Nexus Enterprise Protocol</p>
       </div>
     </div>
   );
