@@ -6,6 +6,7 @@ import { LayoutDashboard, Box, Truck, Users, Settings, Package2 } from "lucide-r
 import { CommandMenu } from '@/src/components/ui/CommandMenu';
 import { Toaster } from 'sonner';
 import NexusCopilot from '@/src/components/ui/NexusCopilot';
+import RealtimeListener from '@/src/components/ui/RealtimeListener';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,7 +56,7 @@ export default function RootLayout({
             <NavItem href="/fleet" icon={<Truck size={18} />} label="Fleet Map" />
             <NavItem href="/drivers" icon={<Users size={18} />} label="Driver Team" />
           </nav>
-=
+
           <div className="p-4 border-t border-slate-100 shrink-0">
             <Link href="/settings" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer group">
               <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs group-hover:border-blue-200 group-hover:text-blue-600 transition-colors">
@@ -80,6 +81,8 @@ export default function RootLayout({
           <CommandMenu />
           
           <NexusCopilot />
+          
+          <RealtimeListener />
           
           <Toaster 
             position="bottom-right" 

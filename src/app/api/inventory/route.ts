@@ -5,17 +5,44 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const offset = (page - 1) * limit;
 
-    let sql = `
-      SELECT id, sku, name, stock, price, location, status 
+    const sqlData = `
+      SELECT id, sku, name, category, stock, price, location, status, image_url
       FROM products 
       WHERE name ILIKE $1 OR sku ILIKE $1 
       ORDER BY id ASC
+      LIMIT $2 OFFSET $3
     `;
 
-    const result = await query(sql, [`%${search}%`]);
-    return NextResponse.json(result.rows);
+    const sqlCount = `
+      SELECT COUNT(*) as total 
+      FROM products 
+      WHERE name ILIKE $1 OR sku ILIKE $1
+    `;
+
+    const [resData, resCount] = await Promise.all([
+      query(sqlData, [`%${search}%`, limit, offset]),
+      query(sqlCount, [`%${search}%`])
+    ]);
+
+    const totalItems = Number(resCount.rows[0].total);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return NextResponse.json({
+      data: resData.rows,
+      meta: {
+        total: totalItems,
+        page,
+        totalPages,
+        limit
+      }
+    });
+
   } catch (error) {
+    console.error("Inventory API Error:", error);
     return NextResponse.json({ error: 'Gagal mengambil data' }, { status: 500 });
   }
 }
@@ -40,7 +67,7 @@ export async function POST(req: Request) {
     const result = await query(sql, [sku, name, stock, price, location, status]);
     return NextResponse.json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    console.error("Inbound Error:", error);
     return NextResponse.json({ error: 'Gagal menyimpan data' }, { status: 500 });
   }
 }
