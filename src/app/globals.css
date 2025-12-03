@@ -10,41 +10,26 @@
   --color-dark-900: #0f172a;
 }
 
-@layer base {
-  :root {
-    --background: #f8fafc; 
-    --foreground: #0f172a;
-    --card: #ffffff;
-    --card-foreground: #0f172a;
-    --border: #e2e8f0;
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
-  }
+:root {
+  --background: #f8fafc; 
+  --foreground: #0f172a;
+}
 
-  .dark {
-    --background: #020617; 
-    --foreground: #f8fafc;
-    --card: #0f172a; 
-    --card-foreground: #f8fafc;
-    --border: #1e293b;
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
-  }
-
-  body {
-    @apply bg-[var(--background)] text-[var(--foreground)] transition-colors duration-300;
-    background-image: radial-gradient(var(--border) 1px, transparent 1px);
-    background-size: 24px 24px;
-    -webkit-font-smoothing: antialiased;
-  }
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-font-smoothing: antialiased;
 }
 
 @utility card-basic {
-  @apply bg-[var(--card)]/80 backdrop-blur-sm border border-[var(--border)]/60 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 text-[var(--card-foreground)];
+  @apply bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-xl shadow-sm hover:shadow-md transition-all duration-300;
 }
 
 @utility card-premium {
-  @apply bg-[var(--card)]/90 backdrop-blur-md border border-[var(--border)]/80 rounded-2xl shadow-[0_4px_20px_-4px_rgba(6,81,237,0.08)] transition-all duration-300;
+  @apply bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-[0_4px_20px_-4px_rgba(6,81,237,0.08)] transition-all duration-300;
   
   &:hover {
     @apply shadow-[0_8px_30px_-4px_rgba(6,81,237,0.12)] border-blue-200/50 translate-y-[-2px];
@@ -60,9 +45,9 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300/80 dark:bg-slate-600/80 rounded-full transition-colors;
+    @apply bg-slate-300/80 rounded-full transition-colors;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400 dark:bg-slate-500;
+    @apply bg-slate-400;
   }
 }
